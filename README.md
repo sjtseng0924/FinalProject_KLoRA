@@ -32,7 +32,7 @@ In the supplementary materials of our paper, we propose another scale s* . If yo
 
 ### Installation
 ```
-git clone https://github.com/ouyangziheng/K-LoRA.git
+git clone https://github.com/HVision-NKU/K-LoRA.git
 cd K-LoRA
 pip install -r requirements.txt
 ```
