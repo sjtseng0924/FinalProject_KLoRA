@@ -10,6 +10,37 @@ from diffusers.models.lora import LoRACompatibleLinear
 
 LORA_WEIGHT_NAME_SAFE = "pytorch_lora_weights.safetensors"
 
+# --- BEGIN: helpers (新增) ---
+def _candidate_prefixes(key: str):
+    # 優先用原鍵名，再嘗試互換 'unet.' 與 'unet.unet.' 前綴
+    yield key
+    if key.startswith("unet.unet."):
+        yield key.replace("unet.unet.", "unet.", 1)
+    elif key.startswith("unet."):
+        yield key.replace("unet.", "unet.unet.", 1)
+
+def _get_with_prefix_fallback(tensors: Dict[str, torch.Tensor], key: str) -> torch.Tensor:
+    for k in _candidate_prefixes(key):
+        if k in tensors:
+            return tensors[k]
+    # 全都找不到就維持 KeyError，方便偵錯
+    raise KeyError(key)
+
+def _to_lora_compatible(linear: nn.Linear) -> LoRACompatibleLinear:
+    """把一般 Linear 換成 LoRACompatibleLinear（保留權重/偏置/裝置與 dtype）。"""
+    wrapped = LoRACompatibleLinear(
+        in_features=linear.in_features,
+        out_features=linear.out_features,
+        bias=(linear.bias is not None),
+        device=linear.weight.device,
+        dtype=linear.weight.dtype,
+    )
+    wrapped.weight.data.copy_(linear.weight.data)
+    if linear.bias is not None:
+        wrapped.bias.data.copy_(linear.bias.data)
+    return wrapped
+# --- END: helpers (新增) ---
+
 
 def get_lora_weights(
     lora_name_or_path: str,
@@ -63,8 +94,8 @@ def merge_lora_weights(
     for part in ["to_q", "to_k", "to_v", "to_out.0"]:
         down_key = target_key + f".{part}.lora.down.weight"
         up_key = target_key + f".{part}.lora.up.weight"
-        out1[part] = tensors[up_key]
-        out2[part] = tensors[down_key]
+        out1[part] = _get_with_prefix_fallback(tensors, up_key)
+        out2[part] = _get_with_prefix_fallback(tensors, down_key)
     return out1, out2
 
 
@@ -85,8 +116,8 @@ def merge_sd_lora_weights(
     for part in ["to_q", "to_k", "to_v", "to_out.0"]:
         down_key = target_key + f".{part}.lora.down.weight"
         up_key = target_key + f".{part}.lora.up.weight"
-        out1[part] = tensors[up_key]
-        out2[part] = tensors[down_key]
+        out1[part] = _get_with_prefix_fallback(tensors, up_key)
+        out2[part] = _get_with_prefix_fallback(tensors, down_key)
     return out1, out2
 
 
@@ -98,10 +129,6 @@ def merge_community_flux_lora_weights(
         tensors (torch.Tensor): state dict of lora weights
         key (str): target attn layer's key
         prefix (str, optional): prefix for state dict. Defaults to "unet.unet.".
-    """
-    """
-    target_key = prefix + key + "."
-
     """
     target_key = prefix + key + "."
 
@@ -242,6 +269,18 @@ def insert_sd_klora_to_unet(
             "state_dict_2_b": merged_lora_weights_dict_2_b,
             "pattern": pattern,
         }
+
+        # ---- BEGIN: ensure LoRACompatibleLinear wrappers (新增) ----
+        if not hasattr(attn_module.to_q, "set_lora_layer"):
+            attn_module.to_q = _to_lora_compatible(attn_module.to_q)
+        if not hasattr(attn_module.to_k, "set_lora_layer"):
+            attn_module.to_k = _to_lora_compatible(attn_module.to_k)
+        if not hasattr(attn_module.to_v, "set_lora_layer"):
+            attn_module.to_v = _to_lora_compatible(attn_module.to_v)
+        if not hasattr(attn_module.to_out[0], "set_lora_layer"):
+            attn_module.to_out[0] = _to_lora_compatible(attn_module.to_out[0])
+        # ---- END: ensure LoRACompatibleLinear wrappers (新增) ----
+
         # Set the `lora_layer` attribute of the attention-related matrices.
         attn_module.to_q.set_lora_layer(
             initialize_klora_layer(
@@ -312,6 +351,18 @@ def insert_community_sd_lora_to_unet(
             "state_dict_2_a": merged_lora_weights_dict_2_a,
             "state_dict_2_b": merged_lora_weights_dict_2_b,
         }
+
+        # ---- BEGIN: ensure LoRACompatibleLinear wrappers (新增) ----
+        if not hasattr(attn_module.to_q, "set_lora_layer"):
+            attn_module.to_q = _to_lora_compatible(attn_module.to_q)
+        if not hasattr(attn_module.to_k, "set_lora_layer"):
+            attn_module.to_k = _to_lora_compatible(attn_module.to_k)
+        if not hasattr(attn_module.to_v, "set_lora_layer"):
+            attn_module.to_v = _to_lora_compatible(attn_module.to_v)
+        if not hasattr(attn_module.to_out[0], "set_lora_layer"):
+            attn_module.to_out[0] = _to_lora_compatible(attn_module.to_out[0])
+        # ---- END: ensure LoRACompatibleLinear wrappers (新增) ----
+
         # Set the `lora_layer` attribute of the attention-related matrices.
         attn_module.to_q.set_lora_layer(
             initialize_klora_layer(
