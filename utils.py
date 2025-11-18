@@ -10,9 +10,8 @@ from diffusers.models.lora import LoRACompatibleLinear
 
 LORA_WEIGHT_NAME_SAFE = "pytorch_lora_weights.safetensors"
 
-# --- BEGIN: helpers (新增) ---
+# --- BEGIN: Add Function ---
 def _candidate_prefixes(key: str):
-    # 優先用原鍵名，再嘗試互換 'unet.' 與 'unet.unet.' 前綴
     yield key
     if key.startswith("unet.unet."):
         yield key.replace("unet.unet.", "unet.", 1)
@@ -23,11 +22,9 @@ def _get_with_prefix_fallback(tensors: Dict[str, torch.Tensor], key: str) -> tor
     for k in _candidate_prefixes(key):
         if k in tensors:
             return tensors[k]
-    # 全都找不到就維持 KeyError，方便偵錯
     raise KeyError(key)
 
 def _to_lora_compatible(linear: nn.Linear) -> LoRACompatibleLinear:
-    """把一般 Linear 換成 LoRACompatibleLinear（保留權重/偏置/裝置與 dtype）。"""
     wrapped = LoRACompatibleLinear(
         in_features=linear.in_features,
         out_features=linear.out_features,
@@ -39,7 +36,7 @@ def _to_lora_compatible(linear: nn.Linear) -> LoRACompatibleLinear:
     if linear.bias is not None:
         wrapped.bias.data.copy_(linear.bias.data)
     return wrapped
-# --- END: helpers (新增) ---
+# --- END: Add Function ---
 
 
 def get_lora_weights(
@@ -270,7 +267,7 @@ def insert_sd_klora_to_unet(
             "pattern": pattern,
         }
 
-        # ---- BEGIN: ensure LoRACompatibleLinear wrappers (新增) ----
+        # ---- BEGIN: ensure LoRACompatibleLinear wrappers ----
         if not hasattr(attn_module.to_q, "set_lora_layer"):
             attn_module.to_q = _to_lora_compatible(attn_module.to_q)
         if not hasattr(attn_module.to_k, "set_lora_layer"):
@@ -279,7 +276,7 @@ def insert_sd_klora_to_unet(
             attn_module.to_v = _to_lora_compatible(attn_module.to_v)
         if not hasattr(attn_module.to_out[0], "set_lora_layer"):
             attn_module.to_out[0] = _to_lora_compatible(attn_module.to_out[0])
-        # ---- END: ensure LoRACompatibleLinear wrappers (新增) ----
+        # ---- END: ensure LoRACompatibleLinear wrappers ----
 
         # Set the `lora_layer` attribute of the attention-related matrices.
         attn_module.to_q.set_lora_layer(
@@ -352,7 +349,7 @@ def insert_community_sd_lora_to_unet(
             "state_dict_2_b": merged_lora_weights_dict_2_b,
         }
 
-        # ---- BEGIN: ensure LoRACompatibleLinear wrappers (新增) ----
+        # ---- BEGIN: ensure LoRACompatibleLinear wrappers ----
         if not hasattr(attn_module.to_q, "set_lora_layer"):
             attn_module.to_q = _to_lora_compatible(attn_module.to_q)
         if not hasattr(attn_module.to_k, "set_lora_layer"):
@@ -361,7 +358,7 @@ def insert_community_sd_lora_to_unet(
             attn_module.to_v = _to_lora_compatible(attn_module.to_v)
         if not hasattr(attn_module.to_out[0], "set_lora_layer"):
             attn_module.to_out[0] = _to_lora_compatible(attn_module.to_out[0])
-        # ---- END: ensure LoRACompatibleLinear wrappers (新增) ----
+        # ---- END: ensure LoRACompatibleLinear wrappers ----
 
         # Set the `lora_layer` attribute of the attention-related matrices.
         attn_module.to_q.set_lora_layer(
