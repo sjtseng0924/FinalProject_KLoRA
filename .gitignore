@@ -6,3 +6,10 @@ visual.py
 test.py
 weights
 inference_waterpainting_only.py
+.claude/
+outputs_abs_fixed/
+outputs_cat/
+outputs_frobenius_fixed/
+outputs_nuclear_fixed/
+outputs_squared_fixed/
+datasets/cat/

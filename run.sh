@@ -1,8 +1,8 @@
 export MODEL_NAME="stabilityai/stable-diffusion-xl-base-1.0"
-export LORA_PATH_CONTENT="./lora-sdxl-dog/pytorch_lora_weights.safetensors"
+export LORA_PATH_CONTENT="./lora-sdxl-cat/pytorch_lora_weights.safetensors"
 export LORA_PATH_STYLE="./lora-sdxl-waterpainting/pytorch_lora_weights.safetensors"
-export OUTPUT_FOLDER="./outputs_cartoon"  
-export PROMPT="a dog in cartoon style"
+export OUTPUT_FOLDER="./outputs_cat"  
+export PROMPT="a cat in watercolor style "
 
 python inference_sd.py \
   --pretrained_model_name_or_path="$MODEL_NAME" \

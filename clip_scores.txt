@@ -1,0 +1,4 @@
+abs/fixed: 37.6706
+squared/fixed: 37.9400
+
+clip score between images
