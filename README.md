@@ -157,3 +157,8 @@ If you have any questions or suggestions, please feel free to open an issue or c
 ## License
 Licensed under a [Creative Commons Attribution-NonCommercial 4.0 International](https://creativecommons.org/licenses/by-nc/4.0/) for Non-commercial use only.
 Any commercial use should get formal permission first.
+
+## clip score
+```
+python evaluate_clip_scores.py --generated_folder outputs --content_folder datasets/dog --style_folder datasets/waterpainting --text_content "sbu dog" --text_style "waterpainting style"
+```
