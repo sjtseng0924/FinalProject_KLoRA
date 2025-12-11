@@ -35,3 +35,4 @@ accelerate launch --num_processes=2 train_dreambooth_lora_sdxl.py \
   --enable_xformers_memory_efficient_attention \
   --gradient_checkpointing \
   --use_8bit_adam \
+  --report_to="wandb"
