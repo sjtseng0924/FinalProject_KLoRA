@@ -1,8 +1,10 @@
 **/__pycache__/
-outputs
+outputs*/
 loras
 loraDataset
 visual.py
 test.py
 weights
 inference_waterpainting_only.py
+.claude/
+datasets/cat/
