@@ -1,10 +1,10 @@
 export MODEL_NAME="stabilityai/stable-diffusion-xl-base-1.0"
 
 # for subject
-export OUTPUT_DIR="lora-sdxl-cat"
-export INSTANCE_DIR="datasets/cat"
-export PROMPT="a cat"
-export VALID_PROMPT="a cat in a bucket"
+export OUTPUT_DIR="lora-sdxl-sketch"
+export INSTANCE_DIR="datasets/sketch"
+export PROMPT="a abc style image"
+export VALID_PROMPT="a man in abc style"
 
 # for style
 # export OUTPUT_DIR="lora-sdxl-waterpainting"
@@ -24,7 +24,6 @@ accelerate launch --num_processes=2 train_dreambooth_lora_sdxl.py \
   --resolution=1024 \
   --train_batch_size=1 \
   --learning_rate=5e-5 \
-  --report_to="wandb" \
   --lr_scheduler="constant" \
   --lr_warmup_steps=0 \
   --max_train_steps=1000 \
@@ -35,4 +34,3 @@ accelerate launch --num_processes=2 train_dreambooth_lora_sdxl.py \
   --enable_xformers_memory_efficient_attention \
   --gradient_checkpointing \
   --use_8bit_adam \
-  --report_to="wandb"
