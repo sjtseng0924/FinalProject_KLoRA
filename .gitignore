@@ -7,4 +7,3 @@ test.py
 weights
 inference_waterpainting_only.py
 .claude/
-datasets/cat/
