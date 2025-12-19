@@ -1,8 +1,8 @@
 export MODEL_NAME="stabilityai/stable-diffusion-xl-base-1.0"
-export LORA_PATH_CONTENT="./lora-sdxl-cat/pytorch_lora_weights.safetensors"
-export LORA_PATH_STYLE="./lora-sdxl-waterpainting/pytorch_lora_weights.safetensors"
-export OUTPUT_FOLDER="./outputs_cat"  
-export PROMPT="a cat in watercolor style "
+export LORA_PATH_CONTENT="./lora-sdxl-catnew/pytorch_lora_weights.safetensors"
+export LORA_PATH_STYLE="lora-sdxl-waterpaintingnew/pytorch_lora_weights.safetensors"
+export OUTPUT_FOLDER="./anncba(fixabs)"  
+export PROMPT="ann's cat in cba style"
 
 python inference_sd.py \
   --pretrained_model_name_or_path="$MODEL_NAME" \

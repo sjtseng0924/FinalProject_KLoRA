@@ -9,3 +9,5 @@ inference_waterpainting_only.py
 .claude/
 train_lora.sh
 requirements.txt
+anncba(fixabs)
+eval.sh
