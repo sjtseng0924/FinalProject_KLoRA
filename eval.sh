@@ -1,0 +1,1 @@
+python evaluate_clip_scores.py --generated_folder outputs_abs_fixed --content_folder datasets/dog --style_folder datasets/waterpainting --text_content "sbu dog" --text_style "waterpainting style"

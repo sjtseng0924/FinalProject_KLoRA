@@ -10,7 +10,6 @@ inference_waterpainting_only.py
 train_lora.sh
 requirements.txt
 anncba(fixabs)
-eval.sh
 clip_scores.json
 output_oil/
 sbudog_oilpainting/
