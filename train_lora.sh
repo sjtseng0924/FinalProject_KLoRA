@@ -1,10 +1,10 @@
 export MODEL_NAME="stabilityai/stable-diffusion-xl-base-1.0"
 
 # for subject
-export OUTPUT_DIR="lora-sdxl-catnew"
-export INSTANCE_DIR="datasets/cat"
-export PROMPT="ann's cat"
-export VALID_PROMPT="ann's cat sitting on the sofa"
+export OUTPUT_DIR="lora-sdxl-oilpainting"
+export INSTANCE_DIR="datasets/oil_painting"
+export PROMPT="a jin style"
+export VALID_PROMPT="a jin style image"
 
 # for style
 # export OUTPUT_DIR="lora-sdxl-waterpainting"
