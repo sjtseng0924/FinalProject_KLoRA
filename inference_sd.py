@@ -49,7 +49,7 @@ def parse_args():
 args = parse_args()
 pattern = args.pattern
 if pattern == "s*":
-    alpha = 1.5
+    alpha = 3.0
     beta = alpha * 0.85
 else:
     alpha = 1.5
