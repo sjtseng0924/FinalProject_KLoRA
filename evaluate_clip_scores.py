@@ -49,8 +49,7 @@ def cosine_similarity(a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
 def aggregate_similarity(generated_emb: torch.Tensor, ref_emb: torch.Tensor) -> Dict[str, float]:
     if ref_emb.numel() == 0 or generated_emb.numel() == 0:
         return {"mean": math.nan, "median": math.nan, "max": math.nan}
-    sims = cosine_similarity(generated_emb, ref_emb)  # [G, R]
-    # For each generated image, average similarity over references
+    sims = cosine_similarity(generated_emb, ref_emb)  
     per_image = sims.mean(dim=1)
     return {
         "mean": per_image.mean().item(),
