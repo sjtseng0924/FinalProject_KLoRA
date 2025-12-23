@@ -1,0 +1,27 @@
+{
+  "image_content_similarity": {
+    "mean": 0.7822502255439758,
+    "median": 0.7819265723228455,
+    "max": 0.8254016041755676
+  },
+  "image_style_similarity": {
+    "mean": 0.6543542742729187,
+    "median": 0.6530672311782837,
+    "max": 0.7030048370361328
+  },
+  "text_content_similarity": {
+    "mean": 0.2728522717952728,
+    "median": 0.27137771248817444,
+    "max": 0.2969462275505066
+  },
+  "text_style_similarity": {
+    "mean": 0.21147218346595764,
+    "median": 0.2100871205329895,
+    "max": 0.23071600496768951
+  },
+  "counts": {
+    "generated": 40,
+    "content_refs": 5,
+    "style_refs": 6
+  }
+}

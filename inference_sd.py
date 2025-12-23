@@ -43,17 +43,57 @@ def parse_args():
         help="Pattern for the image generation",
         default="s*",
     )
+    parser.add_argument(
+        "--alpha",
+        type=float,
+        default=None,
+        help="Override alpha; if None, use pattern default",
+    )
+    parser.add_argument(
+        "--beta",
+        type=float,
+        default=None,
+        help="Override beta; if None, use pattern default",
+    )
+    parser.add_argument(
+        "--alpha_blocks",
+        type=str,
+        default=None,
+        help='JSON for per-block alpha, e.g. {"down":4,"mid":4,"up":4}',
+    )
+    parser.add_argument(
+        "--beta_blocks",
+        type=str,
+        default=None,
+        help='JSON for per-block beta, e.g. {"down":3,"mid":3,"up":3}',
+    )
+    parser.add_argument(
+        "--num_images",
+        type=int,
+        default=10,
+        help="Number of images to generate",
+    )
     return parser.parse_args()
 
 
 args = parse_args()
 pattern = args.pattern
 if pattern == "s*":
-    alpha = 1.5
+    alpha = 6
     beta = alpha * 0.85
 else:
     alpha = 1.5
     beta = 0.5
+
+# override alpha/beta if specified
+if args.alpha is not None:
+    alpha = args.alpha
+if args.beta is not None:
+    beta = args.beta
+
+import json
+alpha_blocks = json.loads(args.alpha_blocks) if args.alpha_blocks else None
+beta_blocks = json.loads(args.beta_blocks) if args.beta_blocks else None
 
 sum_timesteps = 28000
 
@@ -64,7 +104,15 @@ pipe = DiffusionPipeline.from_pretrained(
     use_safetensors=True,
 )
 pipe.unet = insert_sd_klora_to_unet(
-    pipe.unet, args.lora_name_or_path_content, args.lora_name_or_path_style, alpha, beta, sum_timesteps, pattern
+    pipe.unet,
+    args.lora_name_or_path_content,
+    args.lora_name_or_path_style,
+    alpha,
+    beta,
+    sum_timesteps,
+    pattern,
+    alpha_blocks=alpha_blocks,
+    beta_blocks=beta_blocks,
 )
 # UNet/TE:fp16; VAE:fp32;
 pipe.unet.to(dtype=torch.float16)
@@ -91,8 +139,7 @@ pipe.vae.decode = _decode_cast_fp32
 # --- END: Add Dtype Setting ---
 
 def run():
-    seeds = list(range(40))
-    seeds = [see for see in seeds]
+    seeds = list(range(args.num_images))
     os.makedirs(args.output_folder, exist_ok=True)
 
     for index, seed in enumerate(seeds):

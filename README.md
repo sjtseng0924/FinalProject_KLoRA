@@ -160,5 +160,5 @@ Any commercial use should get formal permission first.
 
 ## clip score
 ```
-python evaluate_clip_scores.py --generated_folder outputs --content_folder datasets/dog --style_folder datasets/waterpainting --text_content "sbu dog" --text_style "waterpainting style"
+python evaluate_clip_scores.py --generated_folder outputs --content_folder datasets/dog --style_folder datasets/waterpainting --text_content "sbu dog" --text_style "xyz style"
 ```

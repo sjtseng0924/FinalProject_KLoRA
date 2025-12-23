@@ -233,8 +233,26 @@ def get_ratio_between_content_and_style(lora_weights_content, lora_weights_style
     return average_ratio
 
 
+def _block_from_name(attn_name: str) -> str:
+    if "down_blocks" in attn_name:
+        return "down"
+    if "mid_block" in attn_name:
+        return "mid"
+    if "up_blocks" in attn_name:
+        return "up"
+    return "global"
+
+
 def insert_sd_klora_to_unet(
-    unet, lora_weights_content_path, lora_weights_style_path, alpha, beta, sum_timesteps, pattern
+    unet,
+    lora_weights_content_path,
+    lora_weights_style_path,
+    alpha,
+    beta,
+    sum_timesteps,
+    pattern,
+    alpha_blocks: Dict[str, float] = None,
+    beta_blocks: Dict[str, float] = None,
 ):
     lora_weights_content = get_lora_weights(lora_weights_content_path)
     lora_weights_style = get_lora_weights(lora_weights_style_path)
@@ -255,9 +273,13 @@ def insert_sd_klora_to_unet(
         merged_lora_weights_dict_2_a, merged_lora_weights_dict_2_b = merge_lora_weights(
             lora_weights_style, attn_name
         )
+        blk = _block_from_name(attn_name)
+        block_alpha = alpha_blocks.get(blk, alpha) if alpha_blocks else alpha
+        block_beta = beta_blocks.get(blk, beta) if beta_blocks else beta
+
         kwargs = {
-            "alpha": alpha,
-            "beta": beta,
+            "alpha": block_alpha,
+            "beta": block_beta,
             "sum_timesteps": sum_timesteps,
             "average_ratio": average_ratio,
             "state_dict_1_a": merged_lora_weights_dict_1_a,

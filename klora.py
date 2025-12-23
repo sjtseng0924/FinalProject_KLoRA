@@ -205,7 +205,8 @@ class KLoRALinearLayer(nn.Module):
         gamma = self.average_ratio
 
         # ===== STEP 1: Compute LoRA weight matrices (ΔW = B·A) =====
-        time_ratio = timestep % sum_timesteps
+        time_ratio = (timestep % sum_timesteps) / sum_timesteps
+        t = torch.tensor(time_ratio, device=self.weight_1_a.device, dtype=self.weight_1_a.dtype)
         matrix1 = self.weight_1_a @ self.weight_1_b  # Content LoRA: ΔWc = Bc·Ac
         matrix2 = self.weight_2_a @ self.weight_2_b  # Style LoRA: ΔWs = Bs·As
 
@@ -227,7 +228,7 @@ class KLoRALinearLayer(nn.Module):
         top_k_sum2 = self.select_topk(importance_matrix2, k)   # STEP 3: Select Top-K
 
         # ===== STEP 4: Apply scaling factors (Equation 7-10) =====
-        scale = alpha * time_ratio / sum_timesteps + beta  # Equation 7
+        scale = alpha * t + beta  # Equation 7 (t is now scheduled)
         if self.pattern == "s*":
             scale = scale % alpha   # Equation 8 (alternative scale)
 
