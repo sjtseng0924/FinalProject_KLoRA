@@ -38,9 +38,8 @@ def parse_args():
 
 args = parse_args()
 
-# ===== 重要：只啟用一個 LoRA =====
 alpha = 1.0
-beta = 0.0              # ❗ 第二個 LoRA 完全關掉
+beta = 0.0              
 sum_timesteps = 28000
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -50,18 +49,16 @@ pipe = DiffusionPipeline.from_pretrained(
     use_safetensors=True,
 )
 
-# ❗ 關鍵技巧：同一個 LoRA path 傳兩次
 pipe.unet = insert_sd_klora_to_unet(
     pipe.unet,
-    args.lora_name_or_path,   # content slot
-    args.lora_name_or_path,   # style slot（但 beta=0）
+    args.lora_name_or_path,   
+    args.lora_name_or_path,   
     alpha,
     beta,
     sum_timesteps,
     args.pattern,
 )
 
-# ===== dtype safety（完全沿用你原本的）=====
 pipe.unet.to(dtype=torch.float16)
 
 if hasattr(pipe, "text_encoder") and pipe.text_encoder is not None:
@@ -81,7 +78,6 @@ try:
 except Exception:
     pass
 
-# 強制 VAE decode fp32
 _orig_decode = pipe.vae.decode
 def _decode_cast_fp32(z, *args, **kwargs):
     if isinstance(z, torch.Tensor) and z.dtype != torch.float32:
@@ -92,7 +88,6 @@ pipe.vae.decode = _decode_cast_fp32
 
 def run():
     os.makedirs(args.output_folder, exist_ok=True)
-
     for seed in range(40):
         generator = torch.Generator(device=device).manual_seed(seed)
         image = pipe(
@@ -103,7 +98,6 @@ def run():
         out = os.path.join(args.output_folder, f"output_{seed}.png")
         image.save(out)
         print(out)
-
 
 if __name__ == "__main__":
     run()
