@@ -13,7 +13,8 @@ export VALID_PROMPT="a td bear image"
 # export VALID_PROMPT="a man in szn style"
 
 # Use only free GPUs (0 and 3) to avoid OOM
-export CUDA_VISIBLE_DEVICES=0,3
+export CUDA_VISIBLE_DEVICES=0,1
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128
 
 accelerate launch --num_processes=2 train_dreambooth_lora_sdxl.py \
   --pretrained_model_name_or_path=$MODEL_NAME  \
@@ -33,4 +34,4 @@ accelerate launch --num_processes=2 train_dreambooth_lora_sdxl.py \
   --mixed_precision="fp16" \
   --enable_xformers_memory_efficient_attention \
   --gradient_checkpointing \
-  --use_8bit_adam \
+  --use_8bit_adam 

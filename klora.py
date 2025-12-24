@@ -16,7 +16,7 @@ class KLoRALinearLayer(nn.Module):
         weight_2_b: torch.Tensor,
         average_ratio: float = 1.0,
         rank: int = 8,
-        alpha: int = 1.5,
+        alpha: int = 8.0,
         beta: int = 0.5,
         sum_timesteps: int = 28000,
         pattern:str = "s*",
